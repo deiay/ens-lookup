@@ -1,0 +1,9 @@
+{
+  "name": "ens-lookup",
+  "version": "1.0.0",
+  "main": "index.ts",
+  "repository": "git@github.com:deiay/ens-lookup.git",
+  "author": "deiay <davidaideyan@gmail.com>",
+  "license": "MIT",
+  "private": false
+}
