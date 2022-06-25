@@ -3,7 +3,50 @@ import Head from 'next/head'
 import Image from 'next/image'
 import styles from '../styles/Home.module.css'
 
+import { ethers } from "ethers";
+import { useEffect } from 'react'
+import { useState } from 'react'
+//import ENS from "ethereum-ens";
+// ENS functionality is provided directly on the core provider object.
+
+// Use the mainnet
+const network = "homestead";
+const mainnetProvider = ethers.getDefaultProvider(network, {
+  infura: {
+       projectId: "52aa216f11be4aee86232787a4f4f7a2",
+       projectSecret: "812406e38cdb416aa2d45291bb7dfdd9",
+    }
+});
+mainnetProvider.lookupAddress("0x5555763613a12D8F3e73be831DFf8598089d3dCa").then((result: any) => {
+  console.log(result)
+});
+
+
+  mainnetProvider.resolveName('kitan.eth').then((result: any) => {
+    console.log(result)
+  });
+// const lookupAddr = async () =>{
+
+//   mainnetProvider.lookupAddress("0x5555763613a12D8F3e73be831DFf8598089d3dCa").then((result: any) => {
+//     console.log(result)
+//   });
+
+//   mainnetProvider.lookupAddress('ricmoo.eth').then((result: any) => {
+//     console.log(result)
+//   });
+
+// }
+
 const Home: NextPage = () => {
+
+
+ useEffect(() => {
+ 
+
+    //connectWalletOnPageLoad()
+  }, [])
+
+
   return (
     <div className={styles.container}>
       <Head>

@@ -9,6 +9,8 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "ethereum-ens": "^0.8.0",
+    "ethers": "^5.6.9",
     "next": "12.1.6",
     "react": "18.2.0",
     "react-dom": "18.2.0"
