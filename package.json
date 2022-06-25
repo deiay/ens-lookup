@@ -6,7 +6,8 @@
     "dev": "NODE_ENV=development next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "check_types": "tsc --noEmit"
   },
   "dependencies": {
     "@babel/core": "^7.18.5",
