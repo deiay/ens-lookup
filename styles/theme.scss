@@ -1,0 +1,69 @@
+/** Global Styling **/
+:root {
+	--primary-color: #e0245e;
+	--primary-color-hover: #faca7d;
+	--dark-color: #343a40;
+	--light-color: #f4f4f4;
+	--danger-color: #f75050;
+	--success-color: #90dc96;
+	--border-color: #e5e5e5;
+	--toastify-color-light: #fff !important;
+	--toastify-color-dark: #0c0c0c !important;
+	--toastify-color-info: #3498db !important;
+	--toastify-color-success: #90dc96 !important;
+	--toastify-color-warning: #f1c40f !important;
+	--toastify-color-error: #f75050 !important;
+	--toastify-color-transparent: rgba(255, 255, 255, 0.7) !important;
+	--toastify-icon-color-info: var(--toastify-color-info) !important;
+	--toastify-icon-color-success: var(--toastify-color-success) !important;
+	--toastify-icon-color-warning: var(--toastify-color-warning) !important;
+	--toastify-icon-color-error: var(--toastify-color-error) !important;
+	--navbar-height: 73px;
+}
+
+// fonts
+@font-face {
+	font-family: 'SctoGroteskA';
+	src: url('/fonts/SctoGroteskA/SctoGroteskA-Regular.otf');
+	font-style: normal;
+	font-weight: 400;
+	font-display: swap;
+}
+
+@font-face {
+	font-family: 'SctoGroteskA';
+	src: url('/fonts/SctoGroteskA/SctoGroteskA-Medium.otf');
+	font-style: normal;
+	font-weight: 500;
+	font-display: swap;
+}
+
+@font-face {
+	font-family: 'SctoGroteskA';
+	src: url('/fonts/SctoGroteskA/SctoGroteskA-Bold.otf');
+	font-style: normal;
+	font-weight: 600;
+	font-display: swap;
+}
+
+@font-face {
+	font-family: 'VCROSDMono';
+	src: url('/fonts/VCROSDMono/VcrOsdMono-Regular.otf');
+	font-style: normal;
+	font-weight: 400;
+	font-display: swap;
+}
+
+body {
+	color: rgba(255, 255, 255, 0.87);
+	padding: 0;
+	margin: 0;
+	font-family: 'SctoGroteskA', monospace, -apple-system, BlinkMacSystemFont,
+		'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans',
+		'Helvetica Neue', sans-serif;
+	-webkit-overflow-scrolling: touch;
+	font-size: 16px;
+	overflow-x: hidden;
+	scroll-behavior: smooth;
+	background-color: #000;
+}

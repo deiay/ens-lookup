@@ -1,4 +1,4 @@
-import '../styles/globals.css'
+import '../styles/theme.scss'
 import type { AppProps } from 'next/app'
 import { ThemeProvider } from '@castle-studios/compound'
 
