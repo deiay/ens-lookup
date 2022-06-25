@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useMemo, useState } from "react"
 import { ethers } from 'ethers'
 
-const provider = ethers.providers.getDefaultProvider();
+
+const provider = new ethers.providers.AlchemyProvider('homestead', process.env.ALCHEMY_API_KEY);
 
 const ENS_REGEX = /\.eth$/
 

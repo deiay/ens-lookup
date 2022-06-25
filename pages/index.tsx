@@ -2,19 +2,15 @@ import { Box, LoadingIndicator, PageLayout, Text, ThemeProvider } from '@castle-
 import styled from 'styled-components'
 import type { NextPage } from 'next'
 import Head from 'next/head'
-import { useCallback, useEffect, useState } from 'react'
+import {  useState } from 'react'
 import { Input } from '~components/input'
 import { useEns } from '~hooks/useEns'
-import { ethers } from 'ethers'
-
-const provider = ethers.providers.getDefaultProvider();
 
 const Home: NextPage = () => {
   const [value, setValue] = useState('')
   const [isValidAddres, setIsValidAddress] = useState(false)
 
-  const { matchType, matchData, loading } = useEns(value)
-
+  const {  matchData, loading } = useEns(value)
 
   return (
     <ThemeProvider>
@@ -29,7 +25,10 @@ const Home: NextPage = () => {
           <Input onChange={setValue} value={value} width="300px" placeholder="0x....."/>
         </Box>
         <LoadingIndicator ready={!loading}>
-          {`${JSON.stringify(matchData)} ${matchType}`}
+          {matchData && (Object.keys(matchData) as (keyof typeof matchData)[]).map((key) => {
+            const data = matchData[key]
+            return data && <Text>{`${key}: ${data}`}</Text>
+          })}
         </LoadingIndicator>
       </FullHeightBox>
       </PageLayout>
