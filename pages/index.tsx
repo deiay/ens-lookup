@@ -7,41 +7,46 @@ import {  useState } from 'react'
 import { Input } from '~components/input'
 import { useEns } from '~hooks/useEns'
 import { ethers } from "ethers";
-
-
 import WalletConnectProvider from "@walletconnect/web3-provider";
-import Web3Modal from "web3modal";
-import {ENS, InternalENS} from '@ensdomains/ensjs'
-
-var Web3 = require("web3")
+import { FormControl } from '@mui/material';
 
 
-export const providerOptions = {
 
-  walletconnect: {
-    package: WalletConnectProvider, 
+import { InjectedConnector } from "@web3-react/injected-connector";
+const Injected = new InjectedConnector({
+  supportedChainIds: [1, 3, 4, 5, 42]
+ });
+
+ import { useWeb3React } from '@web3-react/core'
+
+
+
+
+// export const providerOptions = {
+//   walletconnect: {
+//     package: WalletConnectProvider, 
     
-    options: {
-      infuraId: "812406e38cdb416aa2d45291bb7dfdd9"
-    }
-  }
-};
+//     options: {
+//       infuraId: "812406e38cdb416aa2d45291bb7dfdd9"
+//     }
+//   }
+// };
 
-const web3Modal = typeof window === "object" ? new Web3Modal({network: 'homestead', providerOptions }) : undefined;
+// const web3Modal = typeof window === "object" ? new Web3Modal({network: 'homestead', providerOptions }) : undefined;
 
 
 
-// Use the mainnet
-const network = "homestead";
-const mainnetProvider = ethers.getDefaultProvider(network, {
-  infura: {
-       projectId: "52aa216f11be4aee86232787a4f4f7a2",
-       projectSecret: "812406e38cdb416aa2d45291bb7dfdd9",
-    },
-  alchemy: process.env.ALCHEMY_API_KEY
-});
+// // Use the mainnet
+// const network = "homestead";
+// const mainnetProvider = ethers.getDefaultProvider(network, {
+//   infura: {
+//        projectId: "52aa216f11be4aee86232787a4f4f7a2",
+//        projectSecret: "812406e38cdb416aa2d45291bb7dfdd9",
+//     },
+//   alchemy: process.env.ALCHEMY_API_KEY
+// });
 
-console.log(network)
+// console.log(network)
 
 
 
@@ -53,6 +58,16 @@ const Home: NextPage = () => {
   const [library, setLibrary] = useState(null);
 
   const {  matchData, loading } = useEns(value)
+  const { activate, deactivate } = useWeb3React();
+  const [edit, setEdit] = useState(false)
+  const [email, setEmail] = useState(false)
+
+  const [save, setSave] = useState(false)
+  const [selectedImage, setSelectedImage] = useState(null);
+
+
+
+
 
   
 
@@ -61,26 +76,15 @@ const Home: NextPage = () => {
 
   const connectWallet:any = async () => {
 
-    // const provider = new WalletConnectProvider({
-    //     infuraId: "27e484dcd9e3efcfd25a83a78777cdf1",
-    //   });
+
+
+    const provider = new WalletConnectProvider({
+        infuraId: "27e484dcd9e3efcfd25a83a78777cdf1",
+      });
     
-    //     Enable session (triggers QR Code modal)
-    //   await provider.enable();
-    //   setProvider(providers.Web3Provider(provider));
-
-
-  try {
-    const instance = await web3Modal.connect();
-    const provider = new ethers.providers.Web3Provider(instance);
-    const signer = provider.getSigner();
-
-
-    setProvider(provider);
-    setLibrary(library);
-  } catch (error) {
-    console.error(error);
-  }
+        //Enable session (triggers QR Code modal)
+      await provider.enable();
+      setProvider(providers.Web3Provider(provider));
     
 }
 
@@ -104,19 +108,74 @@ const Home: NextPage = () => {
  
         <HeadSubline domain={matchData? matchData.ensName:""} address ={matchData? matchData.address:""} />
         <ProfileCardImageContainer >
+
+
+
+    {save?
+    <>
+        {selectedImage && (
+          <div>
+            <img alt="not fount" width={"250px"} src={URL.createObjectURL(selectedImage)} />
+            <br />
+          </div>
+        )}
+        </>:
         <ProfileCardImage src={matchData? matchData.avatarUrl:""}/>
+
+}
+
+   
+
+
+
         </ProfileCardImageContainer>
+
+
+
+
+
+
         <ProfileCardDescription>
-          <InfoCard >{matchData && matchData.email && matchData.email}</InfoCard>
+          {save?<InfoCard >{email}</InfoCard>:
+          <InfoCard >{matchData && matchData.email && matchData.email}</InfoCard>}
           <InfoCard>{matchData && matchData.twitterHandle && matchData.twitterHandle}</InfoCard>
           <InfoCard>{matchData && matchData.url && matchData.url}</InfoCard>
     
 
         </ProfileCardDescription>
 
-        <EditProfileButton  open={matchData} onClick={ connectWallet }>edit</EditProfileButton>
+        <EditProfileButton  open={matchData} onClick={ () => setEdit(true) }>edit</EditProfileButton>
 
       </ProfileCard>
+
+    {edit?
+    <>
+    Enter email:
+    <Input onChange={setEmail} value={email} />
+
+
+<div>
+
+      <input
+        type="file"
+        name="myImage"
+        onChange={(event) => {
+          console.log(event.target.files[0]);
+          setSelectedImage(event.target.files[0]);
+        }}
+      />
+    </div>
+
+    <button onClick={()=>{
+      setEdit(false)
+      setSave(true)
+      }}>save</button >
+
+    </>:
+    <>
+      
+    </>
+    }
 
 
 
@@ -264,7 +323,7 @@ const SearchButton = styled.button`{
 
 }
 `
-const EditProfileButton = styled.a<{open:boolean}>`
+const EditProfileButton = styled.a<{open?:boolean}>`
   decoration:none;
   color:black;
   border: solid 1px black;
