@@ -1,4 +1,4 @@
-import { Box, LoadingIndicator, PageLayout, Text, ThemeProvider, DropdownMenu } from '@castle-studios/compound'
+import { Box, LoadingIndicator, PageLayout, Text, ThemeProvider} from '@castle-studios/compound'
 import styled from 'styled-components'
 import type { NextPage } from 'next'
 import Image from 'next/image'
@@ -6,13 +6,30 @@ import Head from 'next/head'
 import {  useState } from 'react'
 import { Input } from '~components/input'
 import { useEns } from '~hooks/useEns'
-
-import ethImage from './eth.png'
-
 import { ethers } from "ethers";
-import { useEffect } from 'react'
-//import ENS from "ethereum-ens";
-// ENS functionality is provided directly on the core provider object.
+
+
+import WalletConnectProvider from "@walletconnect/web3-provider";
+import Web3Modal from "web3modal";
+import {ENS, InternalENS} from '@ensdomains/ensjs'
+
+var Web3 = require("web3")
+
+
+export const providerOptions = {
+
+  walletconnect: {
+    package: WalletConnectProvider, 
+    
+    options: {
+      infuraId: "812406e38cdb416aa2d45291bb7dfdd9"
+    }
+  }
+};
+
+const web3Modal = typeof window === "object" ? new Web3Modal({network: 'homestead', providerOptions }) : undefined;
+
+
 
 // Use the mainnet
 const network = "homestead";
@@ -23,26 +40,8 @@ const mainnetProvider = ethers.getDefaultProvider(network, {
     },
   alchemy: process.env.ALCHEMY_API_KEY
 });
-// mainnetProvider.lookupAddress("0x5555763613a12D8F3e73be831DFf8598089d3dCa").then((result: any) => {
-//   console.log(result)
-// });
 
-
-//   mainnetProvider.resolveName('kitan.eth').then((result: any) => {
-//     console.log(result)
-//   });
-// const lookupAddr = async () =>{
-
-//   mainnetProvider.lookupAddress("0x5555763613a12D8F3e73be831DFf8598089d3dCa").then((result: any) => {
-//     console.log(result)
-//   });
-
-//   mainnetProvider.lookupAddress('ricmoo.eth').then((result: any) => {
-//     console.log(result)
-//   });
-
-// }
-
+console.log(network)
 
 
 
@@ -50,57 +49,41 @@ const mainnetProvider = ethers.getDefaultProvider(network, {
 
 const Home: NextPage = () => {
   const [value, setValue] = useState('')
-  const [addr, setAddr] = useState('')
-  const [domain, setDomain] = useState('')
-  const [avatar, setAvatar] = useState('')
-
-  const [openCard, setOpenCard] = useState(false)
-  const [searchInput, setSearchInput] = useState("")
-
-  const [isValidAddres, setIsValidAddress] = useState(false)
+  const [provider, setProvider] = useState(null);
+  const [library, setLibrary] = useState(null);
 
   const {  matchData, loading } = useEns(value)
 
-  const findProfile:any = (search:string) => {
- 
-  var validSearch:boolean = false;
-
-  if(search.toString().slice(-4) == ".eth"){
-    mainnetProvider.resolveName(search.toString()).then((result: any) => {
-
-     
-      console.log("Address found: result: ", result)
-      setAddr(result)
-      setDomain(search)
+  
 
 
-        mainnetProvider.getAvatar(result).then((avt: any) => {
-          validSearch = true
-          setAvatar(avt)
-          console.log(avt)
-          setOpenCard(true)
-        })
- 
-     
-    });
-  }else{
-    mainnetProvider.lookupAddress(search).then((result: any) => {
-      console.log(result)
-      setAddr(searchInput)
-      setDomain(result)
-   
-      mainnetProvider.getAvatar(result).then((avt: any) => {
-        validSearch = true
-        setAvatar(avt)
-        console.log(avt)
-        setOpenCard(true)
-      })
+  
 
-    });
+  const connectWallet:any = async () => {
+
+    // const provider = new WalletConnectProvider({
+    //     infuraId: "27e484dcd9e3efcfd25a83a78777cdf1",
+    //   });
+    
+    //     Enable session (triggers QR Code modal)
+    //   await provider.enable();
+    //   setProvider(providers.Web3Provider(provider));
+
+
+  try {
+    const instance = await web3Modal.connect();
+    const provider = new ethers.providers.Web3Provider(instance);
+    const signer = provider.getSigner();
+
+
+    setProvider(provider);
+    setLibrary(library);
+  } catch (error) {
+    console.error(error);
   }
     
-  
-  }
+}
+
 
 
 
@@ -114,33 +97,36 @@ const Home: NextPage = () => {
       <FullHeightBox spacing={["pt4"]} stacked="column" justify="center" align="center">
         <Box>
           <Text  align="center" bold>Enter an address or domain name</Text>
-          <Input onChange={setSearchInput} value={searchInput} width="300px" placeholder="0x....."/>
+          <Input onChange={setValue} value={value} width="300px" placeholder="0x....."/>
         </Box>
-        <SearchButton onClick={()=>findProfile(searchInput)} >Find Profile</SearchButton>
 
-
-
-   
-
-
-      <ProfileCard open={openCard}>
-        <HeadSubline domain={domain} address={addr} />
+      <ProfileCard open={matchData}>
+ 
+        <HeadSubline domain={matchData? matchData.ensName:""} address ={matchData? matchData.address:""} />
         <ProfileCardImageContainer >
-        <ProfileCardImage src={avatar}/>
+        <ProfileCardImage src={matchData? matchData.avatarUrl:""}/>
         </ProfileCardImageContainer>
         <ProfileCardDescription>
+          <InfoCard >{matchData && matchData.email && matchData.email}</InfoCard>
+          <InfoCard>{matchData && matchData.twitterHandle && matchData.twitterHandle}</InfoCard>
+          <InfoCard>{matchData && matchData.url && matchData.url}</InfoCard>
+    
+
         </ProfileCardDescription>
+
+        <EditProfileButton  open={matchData} onClick={ connectWallet }>edit</EditProfileButton>
+
       </ProfileCard>
 
 
 
-        
+{/*         
         <LoadingIndicator ready={!loading}>
           {matchData && (Object.keys(matchData) as (keyof typeof matchData)[]).map((key) => {
             const data = matchData[key]
             return data && <Text>{`${key}: ${data}`}</Text>
           })}
-        </LoadingIndicator>
+        </LoadingIndicator> */}
       </FullHeightBox>
       </PageLayout>
     </ThemeProvider>      
@@ -152,43 +138,16 @@ export default Home
 const FullHeightBox = styled(Box)`
   height: 100vh;
 `
-const ENSlookup = styled.div`
- background: black;
- width:100%;
- min-height:100vh;
- displa
+
+
+const InfoCard = styled.p<{show?:any}>`
+ padding:4px;
+ margin:0;
+ font-weight:200;
+ ${props => props.edit ? "border: solid 1px red" : ""}
 
 
 `
-const Searchbar = styled.div`
- background: purple;
- width:400px;
- heigh:20px;
- margin:auto;
- display:flex;
- justify-content:center;
-
-`
-
-const Searchfield = styled.input`
-  display:block;
-  background-color: aqua;
-  color:red;
-  border-radius: 8px;
-  width: 200px;
-  text-align: center;
-  padding: 5px 10px;
-  background: url("http://kodyrabatowe.wp.pl/img/ico/search_gr.png") top left     no-repeat;
-  height:30px;
-  padding-left:25px;
-  border: solid black 2px;
-  outline: 0;
-  &:focus {
-    border: solid red 4px;
-  }
-}
-`
-
 
 const ProfileCard = styled.div<{
   open?:boolean
@@ -201,7 +160,9 @@ const ProfileCard = styled.div<{
   height:400px;
   display:flex;
 
+
   margin:auto;
+  padding:6px;
   justify-content:center;
   align-items:center;
   flex-wrap:wrap;
@@ -254,18 +215,18 @@ const HeadSubline = ({ domain, address }: { domain: string, address: string,  })
 };
 
 
-const ProfileCardImageContainer = styled.div`{
+const ProfileCardImageContainer = styled.div<{edit?:boolean}>`{
 
   
   height:60%;
-  width: 100%;
-  max-width: 100%;
+  width: 90%;
+  max-width: 90%;
   display:flex;
   align-items:center;
   justify-content:center;
-
   background-color:white;
 
+  ${props => props.edit ? "border: solid 1px red" : ""}
 
 
 }
@@ -274,18 +235,21 @@ const ProfileCardImageContainer = styled.div`{
 
 const ProfileCardImage = styled.img`{
 
-  max-height:100%;
-  max-width:90%;
+  max-height:90%;
+  max-width:100%;
   background-color:blue;
+
+
+
 }
 `
 
 
 const ProfileCardDescription = styled.div`{
-  backgrund-color:grey;
-  max-height:100%;
-  max-width:100%;
-  background-color:blue;
+
+  width:100%;
+  text-align: center;
+
 }
 `
 
@@ -299,4 +263,18 @@ const SearchButton = styled.button`{
   color: white;
 
 }
+`
+const EditProfileButton = styled.a<{open:boolean}>`
+  decoration:none;
+  color:black;
+  border: solid 1px black;
+  border-radius: 8px;
+  padding: 4px 8px;
+  font-size:12px;
+  ${props => props.open ? "" : "display:none"};
+  &:hover{
+    cursor: pointer;
+    color: white;
+    background-color:black;
+  }
 `
